@@ -76,7 +76,7 @@ jobs:
           printf '%s\n' "$APT_KEY" | gpg --batch --import
           key=$(gpg --batch --list-secret-keys --with-colons | awk -F: '/^fpr/ {print $10; exit}')
           python3 tools/apt_repo.py --out site --key "$key" "$RUNNER_TEMP/note-to-self_${VERSION}_all.deb"
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         if: env.APT_KEY != ''
         with:
           path: site
