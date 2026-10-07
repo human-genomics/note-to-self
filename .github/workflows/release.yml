@@ -80,7 +80,7 @@ jobs:
         if: env.APT_KEY != ''
         with:
           path: site
-      - uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v5
         if: env.APT_KEY != ''
         id: deploy
 
