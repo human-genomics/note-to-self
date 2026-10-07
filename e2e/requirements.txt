@@ -1,2 +1,2 @@
 # Only for the end-to-end tests; Note to Self itself has no dependencies.
-playwright==1.60.0
+playwright==1.63.0
