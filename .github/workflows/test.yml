@@ -29,7 +29,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental == true }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
@@ -48,7 +48,7 @@ jobs:
           - { os: macos-latest, browser: webkit } # the closest to Safari
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.14"
@@ -72,7 +72,7 @@ jobs:
     name: Debian/Ubuntu package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Build the .deb
         run: python3 tools/build_deb.py --out dist
       - name: Install it with apt
@@ -97,7 +97,7 @@ jobs:
     name: apt install from the APT repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Build the .deb and a signed repository (with a throwaway key)
         run: |
           python3 tools/build_deb.py --out dist
@@ -124,7 +124,7 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
       HOMEBREW_NO_INSTALL_CLEANUP: 1
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Write the formula for this commit
         run: |
           version=$(python3 -c "import nts; print(nts.__version__)")

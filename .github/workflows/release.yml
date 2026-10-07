@@ -21,7 +21,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Check the version and the changelog
         id: version
         run: |
@@ -62,7 +62,7 @@ jobs:
       - name: Skip without a signing key
         if: env.APT_KEY == ''
         run: echo "::notice::APT_SIGNING_KEY isn't set, so the APT repository wasn't published. See RELEASING.md."
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: env.APT_KEY != ''
       - name: Build the signed repository
         if: env.APT_KEY != ''
@@ -94,9 +94,9 @@ jobs:
       - name: Skip without the tap's deploy key
         if: env.TAP_KEY == ''
         run: echo "::notice::HOMEBREW_TAP_DEPLOY_KEY isn't set, so the Homebrew tap wasn't updated. See RELEASING.md."
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: env.TAP_KEY != ''
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: env.TAP_KEY != ''
         with:
           repository: human-genomics/homebrew-tap
