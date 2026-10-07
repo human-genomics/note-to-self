@@ -1,0 +1,38 @@
+name: Bug report
+description: Something doesn't work as it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The output of `notetoself --version`
+      placeholder: Note to Self 0.1.0
+  - type: input
+    id: system
+    attributes:
+      label: Operating system and browser
+      placeholder: macOS 15 with Chrome 155
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install it?
+      options:
+        - Homebrew
+        - From source (git clone)
+        - Other
+  - type: textarea
+    id: output
+    attributes:
+      label: Terminal output
+      description: Anything notetoself printed. Please remove the "?key=…" part of the link first.
+      render: text

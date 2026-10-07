@@ -1,0 +1,14 @@
+# Keep the CI actions and the end-to-end test tools current, one grouped pull request each.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /e2e
+    schedule:
+      interval: monthly

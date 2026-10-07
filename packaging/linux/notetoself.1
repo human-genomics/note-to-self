@@ -1,0 +1,80 @@
+.TH NOTETOSELF 1 "@DATE@" "Note to Self @VERSION@" "User Commands"
+.SH NAME
+notetoself \- chat with yourself, saved as Markdown on your computer
+.SH SYNOPSIS
+.B notetoself
+.RB [ \-\-dir
+.IR PATH ]
+.RB [ \-\-port
+.IR N ]
+.RB [ \-\-browser
+.IR NAME ]
+.RB [ \-\-no\-open ]
+.br
+.B notetoself \-\-stop
+.SH DESCRIPTION
+.B notetoself
+starts Note to Self, a chat with yourself that looks like the "Note to Self" chat in Signal
+Desktop, and opens it in a browser window. Every message you send is saved as a plain
+Markdown note, one file per day in a folder per chat.
+.PP
+It runs only on this computer: a small server on 127.0.0.1 that only answers the browser
+window it opened. Press Ctrl+C, choose Quit Note to Self in the window's menu, or run
+.B notetoself \-\-stop
+to stop it. Running
+.B notetoself
+again while it's running opens another window.
+.SH OPTIONS
+.TP
+.BI \-\-dir " PATH"
+The folder for your notes (default:
+.IR ~/NoteToSelf ).
+It must be new, empty, or a Note to Self folder already.
+.TP
+.BI \-\-port " N"
+The local port (default: 6683).
+.TP
+.BI \-\-browser " NAME"
+The browser to open: chrome, chromium, edge, brave, vivaldi, firefox, safari, default (your
+default browser), or the path to a browser. Without it, Note to Self uses the browser chosen
+in Settings, or else an app window of Chrome, Chromium, Edge or Brave if one is installed, or
+else your default browser.
+.TP
+.B \-\-no\-open
+Start without opening a window.
+.TP
+.B \-\-stop
+Stop the Note to Self that's running for this notes folder (the same as Quit in the window's
+menu). Your notes stay where they are.
+.TP
+.B \-\-install\-app
+Add Note to Self to your applications menu (on macOS, to your Applications folder) and exit.
+.TP
+.B \-\-uninstall\-app
+Remove it from your applications again and exit.
+.TP
+.B \-\-background
+Keep running in the background, as the applications menu entry does.
+.TP
+.B \-\-version
+Print the version and exit.
+.SH ENVIRONMENT
+.TP
+.B NOTETOSELF_BROWSER
+The browser to open when
+.B \-\-browser
+isn't given.
+.SH FILES
+.TP
+.I ~/NoteToSelf/
+Everything Note to Self stores: a folder per chat with a Markdown file per day, attachments,
+unsent drafts
+.RI ( .draft.md ),
+the trash
+.RI ( .trash/ ),
+and
+.IR .notetoself.json ,
+which marks the folder and holds the key that lets your browser open it. Settings shows the
+folder, and Settings > Delete all data removes it completely.
+.SH SEE ALSO
+https://github.com/human-genomics/note-to-self

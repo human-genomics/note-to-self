@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local demo / test data (your real notes live in ~/NoteToSelf, never in this repo)
+demo-notes/
+*.part
+dist/
+e2e/artifacts/
