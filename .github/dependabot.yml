@@ -1,0 +1,11 @@
+# Keep the CI actions and the end-to-end test tools current.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: pip
+    directory: /e2e
+    schedule:
+      interval: monthly

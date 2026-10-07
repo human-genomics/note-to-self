@@ -1,0 +1,203 @@
+/* Design tokens: dark theme values measured from Signal Desktop 8.29.0. */
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(../fonts/Inter-Regular.woff2) format("woff2");
+  unicode-range: U+0-2B1B, U+2B1D-10FFFF;
+}
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url(../fonts/Inter-Medium.woff2) format("woff2");
+  unicode-range: U+0-2B1B, U+2B1D-10FFFF;
+}
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: block;
+  src: url(../fonts/Inter-SemiBold.woff2) format("woff2");
+  unicode-range: U+0-2B1B, U+2B1D-10FFFF;
+}
+
+:root {
+  color-scheme: dark;
+
+  --font: Inter, -apple-system, system-ui, "Segoe UI", "Noto Sans", "Helvetica Neue", Helvetica, Arial,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+
+  --bg: #191919;
+  --pane: #1e1e1e;
+  --divider: rgba(255, 255, 255, 0.06);
+  --fill: rgba(150, 150, 150, 0.12);
+  --fill-pressed: rgba(150, 150, 150, 0.16);
+  --fill-strong: rgba(150, 150, 150, 0.2);
+
+  --text: rgba(255, 255, 255, 0.9);
+  --text-name: #e9e9e9;
+  --text-2: #b9b9b9;
+  --text-3: rgba(255, 255, 255, 0.6);
+  --placeholder: rgba(255, 255, 255, 0.35);
+
+  --icon: rgba(255, 255, 255, 0.9);
+  --icon-lp: #dedede;
+  --icon-muted: #848484;
+
+  --ultramarine: #2c6bed;
+  --bubble-top: #0552f0;
+  --bubble-bottom: #2c6bed;
+  --bubble-text: rgba(255, 255, 255, 0.9);
+  --meta: rgba(255, 255, 255, 0.7);
+
+  --input: #323232;
+  --accent: #5563ff;
+  --error: #f44336;
+  --error-text: #ff4a3a;
+
+  --menu-bg: rgba(42, 42, 42, 0.9);
+  --dialog-bg: rgba(53, 53, 53, 0.9);
+  --overlay: rgba(0, 0, 0, 0.48);
+  --elev-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.08), 0 6px 16px rgba(0, 0, 0, 0.24);
+  --gray-3b: #3b3b3b;
+
+  --pane-w: 320px;
+  --strip: 0px; /* ?strip=1 emulates Signal's 28px macOS title strip for pixel comparisons */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font: 400 14px/20px var(--font);
+  letter-spacing: -0.006em;
+  color: var(--text);
+  background: var(--bg);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.icon {
+  display: block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+/* Icon buttons */
+.ib {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  color: var(--icon);
+}
+.ib:hover {
+  background: var(--fill);
+}
+.ib:active {
+  background: var(--fill-pressed);
+}
+.ib.round {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.ib:focus-visible,
+.dlg-btn:focus-visible,
+.menu-item:focus-visible {
+  outline: 2px solid var(--ultramarine);
+  outline-offset: -2px;
+}
+
+/* Avatars */
+.av {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--av-bg, #dde7fc);
+  color: var(--av-fg, #1251d3);
+  overflow: hidden;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.av .icon {
+  width: 62.5%;
+  height: 62.5%;
+}
+.av-label {
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  vertical-align: -0.15em;
+  width: 1em;
+  height: 1em;
+  margin-inline-start: 0.25em;
+  color: var(--accent);
+}
+
+/* Emoji rendered inline at Signal's larger size */
+.emoji {
+  font-size: round(1.4em, 1px);
+  line-height: 1;
+  vertical-align: bottom;
+}

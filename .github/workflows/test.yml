@@ -1,0 +1,143 @@
+name: tests
+
+on:
+  push:
+    branches: ["**"] # tags run these through release.yml
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: unit tests (${{ matrix.os }}, Python ${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-22.04, python: "3.8" } # the oldest supported Python (Ubuntu 20.04's)
+          - { os: ubuntu-latest, python: "3.10" }
+          - { os: ubuntu-latest, python: "3.14" }
+          - { os: macos-latest, python: "3.14" }
+          - { os: windows-latest, python: "3.14", experimental: true } # best effort
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental == true }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run the unit tests
+        run: python -m unittest discover -v tests
+
+  e2e:
+    name: end-to-end (${{ matrix.browser }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, browser: chromium }
+          - { os: ubuntu-latest, browser: firefox }
+          - { os: ubuntu-latest, browser: webkit }
+          - { os: macos-latest, browser: webkit } # the closest to Safari
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: e2e/requirements.txt
+      - name: Install Playwright and ${{ matrix.browser }}
+        run: |
+          python -m pip install -r e2e/requirements.txt
+          python -m playwright install --with-deps ${{ matrix.browser }}
+      - name: Run the end-to-end tests
+        run: python -m e2e --browser ${{ matrix.browser }}
+      - name: Keep screenshots of failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ matrix.os }}-${{ matrix.browser }}
+          path: e2e/artifacts/
+          if-no-files-found: ignore
+
+  deb:
+    name: Debian/Ubuntu package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the .deb
+        run: python3 tools/build_deb.py --out dist
+      - name: Install it with apt
+        run: sudo apt-get install -y ./dist/note-to-self_*_all.deb desktop-file-utils
+      - name: Check the installed app
+        run: |
+          notetoself --version
+          desktop-file-validate /usr/share/applications/note-to-self.desktop
+          notetoself --no-open --port 6690 --dir "$RUNNER_TEMP/notes" &
+          for _ in $(seq 50); do curl -sf -H 'X-NoteToSelf: 1' http://127.0.0.1:6690/api/ping && break; sleep 0.2; done
+          echo
+          test -f "$RUNNER_TEMP/notes/.notetoself.json"
+          kill %1
+      - name: Remove it again
+        run: sudo apt-get remove -y note-to-self && ! command -v notetoself
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: dist/*.deb
+
+  apt:
+    name: apt install from the APT repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the .deb and a signed repository (with a throwaway key)
+        run: |
+          python3 tools/build_deb.py --out dist
+          export GNUPGHOME="$RUNNER_TEMP/gnupg" && mkdir -m 700 "$GNUPGHOME"
+          gpg --batch --passphrase '' --quick-gen-key "CI <ci@example.com>" ed25519 sign never
+          python3 tools/apt_repo.py --out "$RUNNER_TEMP/site" --key ci@example.com --url http://127.0.0.1:8080 dist/*.deb
+          (python3 -m http.server 8080 --directory "$RUNNER_TEMP/site" > /dev/null 2>&1 &)
+          sleep 1
+      - name: Add the repository and install, as the README says
+        run: |
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo wget -qO /etc/apt/keyrings/note-to-self.asc http://127.0.0.1:8080/note-to-self.asc
+          echo "deb [signed-by=/etc/apt/keyrings/note-to-self.asc] http://127.0.0.1:8080 stable main" \
+            | sudo tee /etc/apt/sources.list.d/note-to-self.list
+          sudo apt-get update -o Dir::Etc::sourcelist=/etc/apt/sources.list.d/note-to-self.list -o Dir::Etc::sourceparts=-
+          sudo apt-get install -y --no-install-recommends note-to-self
+          notetoself --version
+          sudo apt-get remove -y note-to-self
+
+  homebrew:
+    name: Homebrew formula
+    runs-on: macos-latest
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+    steps:
+      - uses: actions/checkout@v5
+      - name: Write the formula for this commit
+        run: |
+          version=$(python3 -c "import nts; print(nts.__version__)")
+          tarball="$RUNNER_TEMP/note-to-self-$version.tar.gz"
+          git archive --format=tar.gz --prefix="note-to-self-$version/" -o "$tarball" HEAD
+          brew tap-new --no-git local/test
+          python3 tools/formula.py "$version" --tarball "$tarball" --url "file://$tarball" \
+            --out "$(brew --repository)/Library/Taps/local/homebrew-test/Formula/note-to-self.rb"
+      - name: Check its style
+        run: brew style local/test/note-to-self
+      - name: Install it
+        run: brew install local/test/note-to-self
+      - name: Run its test
+        run: brew test local/test/note-to-self
+      - name: Audit it
+        run: brew audit --strict --formula local/test/note-to-self
